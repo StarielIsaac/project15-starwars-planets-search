@@ -23,6 +23,20 @@ function PlanetsProvider({ children }) {
     }
   };
 
+  // filtro dos numeros
+  const numbersFilter = ({ column, comparison, inputFilter }) => {
+    // console.log();
+    const dataUpdate = dataPlanets.filter((element) => {
+      if (comparison === 'maior que') {
+        return Number(element[column]) > Number(inputFilter);
+      } if (comparison === 'menor que') {
+        return Number(element[column]) < Number(inputFilter);
+      }
+      return Number(element[column]) === Number(inputFilter);
+    });
+    setNewPlanets(dataUpdate);
+  };
+
   // adicionei loading
   useEffect(() => {
     filteredPlanets();
@@ -30,7 +44,7 @@ function PlanetsProvider({ children }) {
 
   // vou prover/injetar esses estados para meus componentes
   const values = useMemo(() => ({
-    errors, loading, valueInput, newPlanets, setValueInput,
+    errors, loading, valueInput, newPlanets, setValueInput, numbersFilter,
   }), [loading, errors, newPlanets, valueInput]);
 
   return (
