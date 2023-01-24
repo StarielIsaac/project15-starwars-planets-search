@@ -1,8 +1,10 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import PlanetsContext from '../context/PlanetsContext';
 
 function Filter() {
-  const { numbersFilter } = useContext(PlanetsContext);
+  const { numbersFilter, optionsFilter, buttonsFiltered,
+    buttonsClick, deteleAllFilters, // addListFilters
+  } = useContext(PlanetsContext);
   const [valuesSelect, setValuesSelect] = useState({
     column: 'population',
     comparison: 'maior que',
@@ -11,7 +13,12 @@ function Filter() {
 
   const handleClick = () => {
     numbersFilter(valuesSelect);
+    // addListFilters(valuesSelect);
   };
+
+  useEffect(() => {
+    setValuesSelect({ ...valuesSelect, column: optionsFilter[0] });
+  }, [optionsFilter]);
 
   const handleChange = ({ target }) => {
     setValuesSelect({
@@ -29,11 +36,18 @@ function Filter() {
         onChange={ handleChange }
         name="column"
       >
-        <option value="population">population</option>
+
+        {
+          optionsFilter.map((option, index) => (
+            <option key={ index } value={ option }>{option}</option>
+          ))
+        }
+
+        {/* <option value="population">population</option>
         <option value="orbital_period">orbital_period</option>
         <option value="diameter">diameter</option>
         <option value="rotation_period">rotation_period</option>
-        <option value="surface_water">surface_water</option>
+        <option value="surface_water">surface_water</option> */}
       </select>
 
       <select
@@ -64,6 +78,33 @@ function Filter() {
       >
         Filtrar
       </button>
+
+      <button
+        onClick={ () => deteleAllFilters() }
+        type="button"
+        data-testid="button-remove-filters"
+      >
+        Apagar Filtros
+      </button>
+      <div>
+        {
+          buttonsFiltered.map((element, index) => (
+            <div
+              key={ index }
+              data-testid="filter"
+            >
+              {element}
+              <button
+                type="button"
+                onClick={ () => buttonsClick(element) }
+              >
+                Apagar
+              </button>
+            </div>
+          ))
+        }
+      </div>
+
     </div>
 
   );

@@ -8,6 +8,45 @@ function PlanetsProvider({ children }) {
   const { dataPlanets, errors, loading } = useFetch();
   const [valueInput, setValueInput] = useState('');
   const [newPlanets, setNewPlanets] = useState([]);
+  const [optionsFilter, setOptions] = useState(['population', 'orbital_period',
+    'diameter', 'rotation_period', 'surface_water']);
+  const [buttonsFiltered, setFiltered] = useState([]);
+  // const [listFilters, setListFilters] = useState([]);
+
+  // const addListFilters = ({ column, comparison, inputFilter }) => {
+  //   if (optionsFilter.length > 0) {
+  //     setListFilters([...listFilters, { column, comparison, inputFilter }]);
+  //   }
+  // };
+
+  const buttonsClick = (text) => {
+    // console.log(text);
+    const newOptions = buttonsFiltered.filter((element) => !element.includes(text));
+    setFiltered(newOptions);
+    const name = text.split(':')[0];
+
+    const dataUpdate = newOptions.reduce((acc, curr) => acc.filter((element) => {
+      const textName = curr.split(':')[0];
+      const condicion = (curr.split(': ')[1].split(',')[0]);
+      const value = curr.split(' ')[3];
+      if (condicion === 'maior que') {
+        return Number(element[textName]) > Number(value);
+      } if (condicion === 'menor que') {
+        return Number(element[textName]) < Number(value);
+      }
+      return Number(element[textName]) === Number(value);
+    }), dataPlanets);
+
+    setNewPlanets(dataUpdate);
+    setOptions([...optionsFilter, name]);
+  };
+
+  const deteleAllFilters = () => {
+    setOptions(['population', 'orbital_period',
+      'diameter', 'rotation_period', 'surface_water']);
+    setFiltered([]);
+    setNewPlanets(dataPlanets);
+  };
 
   const filteredPlanets = () => {
     // const input = valueInput.toLowerCase()
@@ -25,7 +64,11 @@ function PlanetsProvider({ children }) {
 
   // filtro dos numeros
   const numbersFilter = ({ column, comparison, inputFilter }) => {
-    // console.log();
+    setOptions(optionsFilter.filter((option) => option !== column));
+    if (optionsFilter.length > 0) {
+      setFiltered([...buttonsFiltered, `${column}: ${comparison}, ${inputFilter}`]);
+    }
+
     const dataUpdate = newPlanets.filter((element) => {
       if (comparison === 'maior que') {
         return Number(element[column]) > Number(inputFilter);
@@ -44,8 +87,17 @@ function PlanetsProvider({ children }) {
 
   // vou prover/injetar esses estados para meus componentes
   const values = useMemo(() => ({
-    errors, loading, valueInput, newPlanets, setValueInput, numbersFilter,
-  }), [loading, errors, newPlanets, valueInput]);
+    errors,
+    loading,
+    valueInput,
+    newPlanets,
+    setValueInput,
+    numbersFilter,
+    optionsFilter,
+    buttonsFiltered,
+    buttonsClick,
+    deteleAllFilters,
+  }), [loading, errors, newPlanets, valueInput, buttonsFiltered]);
 
   return (
     <PlanetsContext.Provider value={ values }>
