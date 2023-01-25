@@ -95,6 +95,7 @@ function Filter() {
             >
               {element}
               <button
+                data-testid={ `remove-${index}` }
                 type="button"
                 onClick={ () => buttonsClick(element) }
               >
